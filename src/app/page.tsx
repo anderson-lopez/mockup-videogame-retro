@@ -80,8 +80,8 @@ export default function Home() {
   if (isLoading) {
     return (
       <div className="h-screen w-full bg-black flex flex-col items-center justify-center overflow-hidden">
-        <div className="text-white font-bold text-4xl mb-8 tracking-widest pixelated">LOADING...</div>
-        <div className="w-64 h-6 border-2 border-gray-500 relative">
+        <div className="text-white font-bold text-2xl md:text-4xl mb-8 tracking-widest pixelated">LOADING...</div>
+        <div className="w-48 md:w-64 h-6 border-2 border-gray-500 relative">
           <div className="h-full bg-red-600" style={{ width: `${loadingProgress}%` }}></div>
         </div>
         <div className="text-white mt-2">{loadingProgress}%</div>
@@ -93,16 +93,16 @@ export default function Home() {
     switch (currentView) {
       case "start_game":
         return (
-          <div className="grid grid-cols-2 gap-6 h-[calc(100%-60px)]">
-            <div className="bg-gray-800/50 rounded border-2 border-gray-700 p-4 flex flex-col">
-              <h3 className="pixelated text-yellow-400 text-lg mb-3">CHARACTER SELECT</h3>
-              <div className="flex-1 grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 h-[calc(100%-60px)] overflow-y-auto">
+            <div className="bg-gray-800/50 rounded border-2 border-gray-700 p-3 md:p-4 flex flex-col">
+              <h3 className="pixelated text-yellow-400 text-base md:text-lg mb-2 md:mb-3">CHARACTER SELECT</h3>
+              <div className="flex-1 grid grid-cols-2 gap-2 md:gap-4">
                 {[1, 2, 3, 4].map((i) => (
                   <div
                     key={i}
                     className="bg-gray-900 border-2 border-gray-700 rounded flex items-center justify-center cursor-pointer hover:border-yellow-400 hover:bg-gray-800 transition-colors duration-200 relative group"
                   >
-                    <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center text-white pixelated group-hover:bg-gray-600">
+                    <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-700 rounded-full flex items-center justify-center text-white pixelated group-hover:bg-gray-600">
                       P{i}
                     </div>
                     <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-black/80 px-2 py-1 rounded text-xs text-white pixelated opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -113,15 +113,17 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="bg-gray-800/50 rounded border-2 border-gray-700 p-4 flex flex-col">
-              <h3 className="pixelated text-yellow-400 text-lg mb-3">TRACK SELECT</h3>
-              <div className="flex-1 grid grid-cols-2 gap-4">
+            <div className="bg-gray-800/50 rounded border-2 border-gray-700 p-3 md:p-4 flex flex-col">
+              <h3 className="pixelated text-yellow-400 text-base md:text-lg mb-2 md:mb-3">TRACK SELECT</h3>
+              <div className="flex-1 grid grid-cols-2 gap-2 md:gap-4">
                 {["CITY", "FOREST", "DESERT", "SNOW"].map((track, i) => (
                   <div
                     key={i}
                     className="bg-gray-900 border-2 border-gray-700 rounded flex items-center justify-center cursor-pointer hover:border-yellow-400 hover:bg-gray-800 transition-colors duration-200 relative group"
                   >
-                    <div className="text-white pixelated text-center group-hover:text-yellow-400">{track}</div>
+                    <div className="text-white pixelated text-center text-sm md:text-base group-hover:text-yellow-400">
+                      {track}
+                    </div>
                     <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-black/80 px-2 py-1 rounded text-xs text-white pixelated opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                       Click to select
                     </div>
@@ -133,17 +135,17 @@ export default function Home() {
         )
       case "options":
         return (
-          <div className="bg-gray-800/50 rounded border-2 border-gray-700 p-6 h-[calc(100%-60px)]">
-            <h3 className="pixelated text-yellow-400 text-xl mb-6">OPTIONS</h3>
+          <div className="bg-gray-800/50 rounded border-2 border-gray-700 p-4 md:p-6 h-[calc(100%-60px)] overflow-y-auto">
+            <h3 className="pixelated text-yellow-400 text-lg md:text-xl mb-4 md:mb-6">OPTIONS</h3>
 
-            <div className="grid gap-6">
-              <div className="flex items-center justify-between border-b border-gray-700 pb-4">
-                <div className="pixelated text-white">DIFFICULTY</div>
-                <div className="flex gap-4">
+            <div className="grid gap-4 md:gap-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-700 pb-4">
+                <div className="pixelated text-white mb-2 md:mb-0">DIFFICULTY</div>
+                <div className="flex gap-2 md:gap-4">
                   {["EASY", "NORMAL", "HARD"].map((option, i) => (
                     <div
                       key={i}
-                      className={`pixelated px-3 py-1 cursor-pointer ${i === 1 ? "bg-yellow-600 text-black" : "bg-gray-900 text-gray-400 hover:bg-gray-800 hover:text-white"}`}
+                      className={`pixelated px-2 md:px-3 py-1 cursor-pointer text-sm md:text-base ${i === 1 ? "bg-yellow-600 text-black" : "bg-gray-900 text-gray-400 hover:bg-gray-800 hover:text-white"}`}
                     >
                       {option}
                     </div>
@@ -151,43 +153,43 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between border-b border-gray-700 pb-4">
-                <div className="pixelated text-white">SOUND</div>
+              <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-700 pb-4">
+                <div className="pixelated text-white mb-2 md:mb-0">SOUND</div>
                 <div className="flex items-center gap-2">
-                  <div className="pixelated text-gray-400">LOW</div>
-                  <div className="w-48 h-4 bg-gray-900 relative">
+                  <div className="pixelated text-gray-400 text-sm">LOW</div>
+                  <div className="w-32 md:w-48 h-4 bg-gray-900 relative">
                     <div className="absolute h-full bg-yellow-600" style={{ width: "70%" }}></div>
                     <div
-                      className="absolute h-8 w-3 bg-white border-2 border-gray-900 top-1/2 transform -translate-y-1/2"
+                      className="absolute h-6 md:h-8 w-2 md:w-3 bg-white border-2 border-gray-900 top-1/2 transform -translate-y-1/2"
                       style={{ left: "70%" }}
                     ></div>
                   </div>
-                  <div className="pixelated text-gray-400">HIGH</div>
+                  <div className="pixelated text-gray-400 text-sm">HIGH</div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between border-b border-gray-700 pb-4">
-                <div className="pixelated text-white">MUSIC</div>
+              <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-700 pb-4">
+                <div className="pixelated text-white mb-2 md:mb-0">MUSIC</div>
                 <div className="flex items-center gap-2">
-                  <div className="pixelated text-gray-400">LOW</div>
-                  <div className="w-48 h-4 bg-gray-900 relative">
+                  <div className="pixelated text-gray-400 text-sm">LOW</div>
+                  <div className="w-32 md:w-48 h-4 bg-gray-900 relative">
                     <div className="absolute h-full bg-yellow-600" style={{ width: "50%" }}></div>
                     <div
-                      className="absolute h-8 w-3 bg-white border-2 border-gray-900 top-1/2 transform -translate-y-1/2"
+                      className="absolute h-6 md:h-8 w-2 md:w-3 bg-white border-2 border-gray-900 top-1/2 transform -translate-y-1/2"
                       style={{ left: "50%" }}
                     ></div>
                   </div>
-                  <div className="pixelated text-gray-400">HIGH</div>
+                  <div className="pixelated text-gray-400 text-sm">HIGH</div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between border-b border-gray-700 pb-4">
-                <div className="pixelated text-white">VIBRATION</div>
-                <div className="flex gap-4">
+              <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-700 pb-4">
+                <div className="pixelated text-white mb-2 md:mb-0">VIBRATION</div>
+                <div className="flex gap-2 md:gap-4">
                   {["ON", "OFF"].map((option, i) => (
                     <div
                       key={i}
-                      className={`pixelated px-3 py-1 cursor-pointer ${i === 0 ? "bg-yellow-600 text-black" : "bg-gray-900 text-gray-400 hover:bg-gray-800 hover:text-white"}`}
+                      className={`pixelated px-2 md:px-3 py-1 cursor-pointer text-sm md:text-base ${i === 0 ? "bg-yellow-600 text-black" : "bg-gray-900 text-gray-400 hover:bg-gray-800 hover:text-white"}`}
                     >
                       {option}
                     </div>
@@ -195,13 +197,13 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="pixelated text-white">DISPLAY MODE</div>
-                <div className="flex gap-4">
+              <div className="flex flex-col md:flex-row md:items-center justify-between">
+                <div className="pixelated text-white mb-2 md:mb-0">DISPLAY MODE</div>
+                <div className="flex gap-2 md:gap-4">
                   {["4:3", "16:9"].map((option, i) => (
                     <div
                       key={i}
-                      className={`pixelated px-3 py-1 cursor-pointer ${i === 1 ? "bg-yellow-600 text-black" : "bg-gray-900 text-gray-400 hover:bg-gray-800 hover:text-white"}`}
+                      className={`pixelated px-2 md:px-3 py-1 cursor-pointer text-sm md:text-base ${i === 1 ? "bg-yellow-600 text-black" : "bg-gray-900 text-gray-400 hover:bg-gray-800 hover:text-white"}`}
                     >
                       {option}
                     </div>
@@ -213,10 +215,10 @@ export default function Home() {
         )
       case "gallery":
         return (
-          <div className="bg-gray-800/50 rounded border-2 border-gray-700 p-6 h-[calc(100%-60px)] overflow-y-auto">
-            <h3 className="pixelated text-yellow-400 text-xl mb-6">GALLERY</h3>
+          <div className="bg-gray-800/50 rounded border-2 border-gray-700 p-4 md:p-6 h-[calc(100%-60px)] overflow-y-auto">
+            <h3 className="pixelated text-yellow-400 text-lg md:text-xl mb-4 md:mb-6">GALLERY</h3>
 
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="relative group cursor-pointer">
                   <div className="bg-gray-900 border-2 border-gray-700 aspect-video flex items-center justify-center hover:border-yellow-400">
@@ -243,15 +245,15 @@ export default function Home() {
         )
       case "high_scores":
         return (
-          <div className="bg-gray-800/50 rounded border-2 border-gray-700 p-6 h-[calc(100%-60px)]">
-            <h3 className="pixelated text-yellow-400 text-xl mb-6">HIGH SCORES</h3>
+          <div className="bg-gray-800/50 rounded border-2 border-gray-700 p-4 md:p-6 h-[calc(100%-60px)] overflow-x-auto">
+            <h3 className="pixelated text-yellow-400 text-lg md:text-xl mb-4 md:mb-6">HIGH SCORES</h3>
 
-            <div className="grid gap-4">
+            <div className="grid gap-2 md:gap-4 min-w-[300px]">
               <div className="flex justify-between pixelated text-white border-b-2 border-gray-700 pb-2">
-                <div className="w-12 text-center">#</div>
+                <div className="w-8 md:w-12 text-center">#</div>
                 <div className="flex-1">NAME</div>
-                <div className="w-24 text-right">SCORE</div>
-                <div className="w-24 text-right">TIME</div>
+                <div className="w-16 md:w-24 text-right">SCORE</div>
+                <div className="w-16 md:w-24 text-right">TIME</div>
               </div>
 
               {[
@@ -263,12 +265,12 @@ export default function Home() {
               ].map((score, i) => (
                 <div
                   key={i}
-                  className={`flex justify-between pixelated ${i === 0 ? "text-yellow-400" : "text-gray-400"} border-b border-gray-700 pb-2`}
+                  className={`flex justify-between pixelated text-sm md:text-base ${i === 0 ? "text-yellow-400" : "text-gray-400"} border-b border-gray-700 pb-2`}
                 >
-                  <div className="w-12 text-center">{i + 1}</div>
+                  <div className="w-8 md:w-12 text-center">{i + 1}</div>
                   <div className="flex-1">{score.name}</div>
-                  <div className="w-24 text-right">{score.score.toLocaleString()}</div>
-                  <div className="w-24 text-right">{score.time}</div>
+                  <div className="w-16 md:w-24 text-right">{score.score.toLocaleString()}</div>
+                  <div className="w-16 md:w-24 text-right">{score.time}</div>
                 </div>
               ))}
             </div>
@@ -276,38 +278,38 @@ export default function Home() {
         )
       case "credits":
         return (
-          <div className="bg-gray-800/50 rounded border-2 border-gray-700 p-6 h-[calc(100%-60px)] overflow-auto">
-            <h3 className="pixelated text-yellow-400 text-xl mb-6">CREDITS</h3>
+          <div className="bg-gray-800/50 rounded border-2 border-gray-700 p-4 md:p-6 h-[calc(100%-60px)] overflow-auto">
+            <h3 className="pixelated text-yellow-400 text-lg md:text-xl mb-4 md:mb-6">CREDITS</h3>
 
-            <div className="grid gap-8">
+            <div className="grid gap-6 md:gap-8">
               <div>
-                <h4 className="pixelated text-white text-lg mb-2">GAME DIRECTOR</h4>
-                <div className="pixelated text-gray-400">JOHN POLYGON</div>
+                <h4 className="pixelated text-white text-base md:text-lg mb-2">GAME DIRECTOR</h4>
+                <div className="pixelated text-gray-400 text-sm md:text-base">JOHN POLYGON</div>
               </div>
 
               <div>
-                <h4 className="pixelated text-white text-lg mb-2">LEAD PROGRAMMER</h4>
-                <div className="pixelated text-gray-400">JANE PIXEL</div>
+                <h4 className="pixelated text-white text-base md:text-lg mb-2">LEAD PROGRAMMER</h4>
+                <div className="pixelated text-gray-400 text-sm md:text-base">JANE PIXEL</div>
               </div>
 
               <div>
-                <h4 className="pixelated text-white text-lg mb-2">GRAPHICS TEAM</h4>
-                <div className="pixelated text-gray-400">ALEX TEXTURE</div>
-                <div className="pixelated text-gray-400">SAM SHADER</div>
-                <div className="pixelated text-gray-400">PAT POLYGON</div>
+                <h4 className="pixelated text-white text-base md:text-lg mb-2">GRAPHICS TEAM</h4>
+                <div className="pixelated text-gray-400 text-sm md:text-base">ALEX TEXTURE</div>
+                <div className="pixelated text-gray-400 text-sm md:text-base">SAM SHADER</div>
+                <div className="pixelated text-gray-400 text-sm md:text-base">PAT POLYGON</div>
               </div>
 
               <div>
-                <h4 className="pixelated text-white text-lg mb-2">SOUND DESIGN</h4>
-                <div className="pixelated text-gray-400">MIKE MIDI</div>
-                <div className="pixelated text-gray-400">LISA LOOP</div>
+                <h4 className="pixelated text-white text-base md:text-lg mb-2">SOUND DESIGN</h4>
+                <div className="pixelated text-gray-400 text-sm md:text-base">MIKE MIDI</div>
+                <div className="pixelated text-gray-400 text-sm md:text-base">LISA LOOP</div>
               </div>
 
               <div>
-                <h4 className="pixelated text-white text-lg mb-2">SPECIAL THANKS</h4>
-                <div className="pixelated text-gray-400">COFFEE MACHINE</div>
-                <div className="pixelated text-gray-400">PIZZA DELIVERY</div>
-                <div className="pixelated text-gray-400">MOM & DAD</div>
+                <h4 className="pixelated text-white text-base md:text-lg mb-2">SPECIAL THANKS</h4>
+                <div className="pixelated text-gray-400 text-sm md:text-base">COFFEE MACHINE</div>
+                <div className="pixelated text-gray-400 text-sm md:text-base">PIZZA DELIVERY</div>
+                <div className="pixelated text-gray-400 text-sm md:text-base">MOM & DAD</div>
               </div>
 
               <div className="text-center pixelated text-yellow-400 mt-4">© 1998 POLYGON STUDIOS</div>
@@ -328,31 +330,33 @@ export default function Home() {
       <div className="absolute bottom-0 w-full h-64 bg-[url('/placeholder.svg?height=200&width=800')] bg-repeat-x opacity-40"></div>
 
       {/* PS1-style header */}
-      <header className="relative z-10 pt-6 px-8">
-        <div className="pixelated text-white text-4xl font-bold tracking-wider text-center mb-4 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
+      <header className="relative z-10 pt-3 md:pt-6 px-4 md:px-8">
+        <div className="pixelated text-white text-2xl md:text-4xl font-bold tracking-wider text-center mb-2 md:mb-4 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
           RETRO REALM
         </div>
-        <div className="pixelated text-yellow-400 text-sm text-center mb-8">© 1998 POLYGON STUDIOS</div>
+        <div className="pixelated text-yellow-400 text-xs md:text-sm text-center mb-4 md:mb-8">
+          © 1998 POLYGON STUDIOS
+        </div>
       </header>
 
       {/* Main content */}
-      <main className="relative z-10 flex h-[calc(100vh-200px)]">
+      <main className="relative z-10 flex h-[calc(100vh-150px)] md:h-[calc(100vh-200px)]">
         {showMenu ? (
           <div className="w-full flex flex-col items-center justify-center">
             <motion.div
-              className="bg-black/70 p-6 rounded-lg border-4 border-gray-700 w-80"
+              className="bg-black/70 p-4 md:p-6 rounded-lg border-4 border-gray-700 w-64 md:w-80"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.3 }}
             >
-              <h2 className="pixelated text-white text-2xl font-bold mb-6 text-center">MAIN MENU</h2>
+              <h2 className="pixelated text-white text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center">MAIN MENU</h2>
 
-              <ul ref={menuRef} className="space-y-4">
+              <ul ref={menuRef} className="space-y-3 md:space-y-4">
                 {menuItems.map((item, index) => (
                   <li
                     key={index}
                     tabIndex={0}
-                    className={`pixelated text-xl font-bold flex items-center relative cursor-pointer transition-colors duration-200 ${
+                    className={`pixelated text-lg md:text-xl font-bold flex items-center relative cursor-pointer transition-colors duration-200 ${
                       selectedMenuItem === index ? "text-yellow-400" : "text-gray-400 hover:text-gray-200"
                     } focus:outline-none`}
                     onClick={() => {
@@ -371,16 +375,18 @@ export default function Home() {
                         animate={{ x: [0, 5, 0] }}
                         transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1 }}
                       >
-                        <ChevronRight className="mr-2 h-5 w-5" />
+                        <ChevronRight className="mr-1 md:mr-2 h-4 w-4 md:h-5 md:w-5" />
                       </motion.div>
                     )}
                     <div className="flex items-center">
-                      {item.icon}
+                      <span className="hidden md:inline-block">{item.icon}</span>
                       <span className={selectedMenuItem === index ? "ml-0" : ""}>{item.name}</span>
                     </div>
                     {selectedMenuItem === index && (
                       <div className="absolute right-0 top-0 bottom-0 flex items-center">
-                        <div className="pixelated text-xs text-gray-500 opacity-70">CLICK/ENTER</div>
+                        <div className="pixelated text-[10px] md:text-xs text-gray-500 opacity-70 hidden md:block">
+                          CLICK/ENTER
+                        </div>
                       </div>
                     )}
                   </li>
@@ -389,25 +395,27 @@ export default function Home() {
             </motion.div>
           </div>
         ) : (
-          <div className="w-full px-8">
+          <div className="w-full px-2 md:px-8">
             <motion.div
-              className="bg-black/70 p-6 rounded-lg border-4 border-gray-700 h-full"
+              className="bg-black/70 p-3 md:p-6 rounded-lg border-2 md:border-4 border-gray-700 h-full"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="pixelated text-white text-2xl font-bold flex items-center">
-                  {menuItems.find((item) => item.name.toLowerCase().replace(/\s+/g, "_") === currentView)?.icon}
+              <div className="flex justify-between items-center mb-3 md:mb-6">
+                <h2 className="pixelated text-white text-lg md:text-2xl font-bold flex items-center">
+                  <span className="hidden md:inline-block">
+                    {menuItems.find((item) => item.name.toLowerCase().replace(/\s+/g, "_") === currentView)?.icon}
+                  </span>
                   {menuItems.find((item) => item.name.toLowerCase().replace(/\s+/g, "_") === currentView)?.name}
                 </h2>
                 <button
                   onClick={() => setShowMenu(true)}
-                  className="bg-gray-800 text-white p-2 rounded border-2 border-gray-600 hover:bg-gray-700 flex items-center relative group"
+                  className="bg-gray-800 text-white p-1 md:p-2 rounded border-2 border-gray-600 hover:bg-gray-700 flex items-center relative group"
                 >
-                  <Menu className="h-5 w-5 mr-1" />
-                  <span className="pixelated text-sm">MENU</span>
-                  <div className="absolute -bottom-8 right-0 bg-black/80 px-2 py-1 rounded text-xs text-white pixelated opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <Menu className="h-4 w-4 md:h-5 md:w-5 mr-1" />
+                  <span className="pixelated text-xs md:text-sm">MENU</span>
+                  <div className="absolute -bottom-8 right-0 bg-black/80 px-2 py-1 rounded text-[10px] md:text-xs text-white pixelated opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     ESC key
                   </div>
                 </button>
@@ -420,15 +428,15 @@ export default function Home() {
       </main>
 
       {/* HUD elements */}
-      <footer className="absolute bottom-0 w-full px-6 py-3 bg-black/80 border-t-2 border-gray-700 flex justify-between items-center group">
-        <div className="text-white pixelated text-sm">MEMORY CARD 1</div>
+      <footer className="absolute bottom-0 w-full px-3 md:px-6 py-2 md:py-3 bg-black/80 border-t-2 border-gray-700 flex justify-between items-center group">
+        <div className="text-white pixelated text-xs md:text-sm">MEMORY CARD 1</div>
         <div className="flex items-center">
-          <div className="w-4 h-4 bg-red-600 rounded-full mr-2"></div>
-          <div className="text-white pixelated text-sm">REC</div>
+          <div className="w-3 h-3 md:w-4 md:h-4 bg-red-600 rounded-full mr-1 md:mr-2"></div>
+          <div className="text-white pixelated text-xs md:text-sm">REC</div>
         </div>
-        <div className="text-white pixelated text-sm">V 1.0</div>
+        <div className="text-white pixelated text-xs md:text-sm">V 1.0</div>
 
-        <div className="absolute -top-24 left-1/2 transform -translate-x-1/2 bg-black/90 p-3 rounded border border-gray-700 text-xs text-white pixelated opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex gap-4">
+        <div className="absolute -top-20 md:-top-24 left-1/2 transform -translate-x-1/2 bg-black/90 p-2 md:p-3 rounded border border-gray-700 text-[10px] md:text-xs text-white pixelated opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex gap-2 md:gap-4">
           <div className="flex flex-col items-center">
             <div className="text-yellow-400">↑↓</div>
             <div>Navigate</div>
