@@ -544,26 +544,39 @@ function getPlayerColor(playerIndex: number): string {
   return colors[playerIndex - 1] || "bg-gray-500"
 }
 
+interface SnakePosition {
+  x: number;
+  y: number;
+}
+
+interface Snake {
+  positions: SnakePosition[];
+  direction: string;
+  color: string;
+  score: number;
+  alive: boolean;
+}
+
+interface Food {
+  x: number
+  y: number
+  type: string
+}
+
 // Snake Game Component
 function SnakeGame({ players, onExit }: { players: number[]; onExit: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [gameState, setGameState] = useState<{
-    snakes: {
-      positions: { x: number; y: number }[]
-      direction: string
-      color: string
-      score: number
-      alive: boolean
-    }[]
-    food: { x: number; y: number; type: string }
-    gameOver: boolean
-    winner: number | null
+    snakes: Snake[];
+    food: Food;
+    gameOver: boolean;
+    winner: number | null;
   }>({
     snakes: [],
     food: { x: 0, y: 0, type: "apple" },
     gameOver: false,
     winner: null,
-  })
+  });
 
   const [gameStarted, setGameStarted] = useState(false)
   const [countdown, setCountdown] = useState(3)
@@ -965,29 +978,30 @@ function SnakeGame({ players, onExit }: { players: number[]; onExit: () => void 
   }
 
   // Generate food at random position
-  const generateFood = (snakes: any[]) => {
-    let x, y
-    let validPosition = false
-
+  const generateFood = (snakes: Snake[]): Food => {
+    let x: number = 0;
+    let y: number = 0;
+    let validPosition = false;
+  
     while (!validPosition) {
-      x = Math.floor(Math.random() * gridSize * 2)
-      y = Math.floor(Math.random() * gridSize * 2)
-
-      validPosition = true
-
+      x = Math.floor(Math.random() * gridSize * 2);
+      y = Math.floor(Math.random() * gridSize * 2);
+  
+      validPosition = true;
+  
       // Check if food spawns on any snake
       for (const snake of snakes) {
-        if (!snake.alive) continue
-
-        if (snake.positions.some((pos: { x: number; y: number }) => pos.x === x && pos.y === y)) {
-          validPosition = false
-          break
+        if (!snake.alive) continue;
+  
+        if (snake.positions.some(pos => pos.x === x && pos.y === y)) {
+          validPosition = false;
+          break;
         }
       }
     }
-
-    return { x, y, type: "apple" }
-  }
+  
+    return { x, y, type: "apple" };
+  };
 
   // Handle exit game
   useEffect(() => {
