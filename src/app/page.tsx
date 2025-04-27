@@ -12,6 +12,12 @@ export default function Home() {
   const [currentView, setCurrentView] = useState("menu")
   const menuRef = useRef<HTMLUListElement>(null)
 
+  // Game state
+  const [selectedCharacter, setSelectedCharacter] = useState<number | null>(null)
+  const [selectedTrack, setSelectedTrack] = useState<string | null>(null)
+  const [showGame, setShowGame] = useState(false)
+  const [activePlayers, setActivePlayers] = useState<number[]>([])
+
   const menuItems = [
     { name: "START GAME", icon: <Gamepad2 className="h-5 w-5 mr-2" /> },
     { name: "OPTIONS", icon: <Settings className="h-5 w-5 mr-2" /> },
@@ -49,6 +55,12 @@ export default function Home() {
     setCurrentView(menuItems[selectedMenuItem].name.toLowerCase().replace(/\s+/g, "_"))
   }
 
+  const startGame = () => {
+    if (selectedCharacter !== null && selectedTrack !== null) {
+      setShowGame(true)
+    }
+  }
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (showMenu) {
@@ -61,14 +73,18 @@ export default function Home() {
         }
       } else {
         if (e.key === "Escape" || e.key === "m" || e.key === "M") {
-          setShowMenu(true)
+          if (showGame) {
+            setShowGame(false)
+          } else {
+            setShowMenu(true)
+          }
         }
       }
     }
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [showMenu, selectedMenuItem])
+  }, [showMenu, selectedMenuItem, showGame])
 
   // Focus the selected menu item when it changes
   useEffect(() => {
@@ -92,24 +108,45 @@ export default function Home() {
   const renderView = () => {
     switch (currentView) {
       case "start_game":
+        if (showGame) {
+          return <SnakeGame players={activePlayers} onExit={() => setShowGame(false)} />
+        }
+
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 h-[calc(100%-60px)] overflow-y-auto">
             <div className="bg-gray-800/50 rounded border-2 border-gray-700 p-3 md:p-4 flex flex-col">
               <h3 className="pixelated text-yellow-400 text-base md:text-lg mb-2 md:mb-3">CHARACTER SELECT</h3>
               <div className="flex-1 grid grid-cols-2 gap-2 md:gap-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className="bg-gray-900 border-2 border-gray-700 rounded flex items-center justify-center cursor-pointer hover:border-yellow-400 hover:bg-gray-800 transition-colors duration-200 relative group"
-                  >
-                    <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-700 rounded-full flex items-center justify-center text-white pixelated group-hover:bg-gray-600">
-                      P{i}
+                {[1, 2, 3, 4].map((i) => {
+                  const isActive = activePlayers.includes(i)
+                  return (
+                    <div
+                      key={i}
+                      className={`bg-gray-900 border-2 ${
+                        isActive ? "border-yellow-400 bg-gray-800" : "border-gray-700"
+                      } rounded flex items-center justify-center cursor-pointer hover:border-yellow-400 hover:bg-gray-800 transition-colors duration-200 relative group`}
+                      onClick={() => {
+                        setSelectedCharacter(i)
+                        if (isActive) {
+                          setActivePlayers(activePlayers.filter((p) => p !== i))
+                        } else {
+                          setActivePlayers([...activePlayers, i])
+                        }
+                      }}
+                    >
+                      <div
+                        className={`w-12 h-12 md:w-16 md:h-16 ${
+                          isActive ? getPlayerColor(i) : "bg-gray-700"
+                        } rounded-full flex items-center justify-center text-white pixelated group-hover:bg-gray-600`}
+                      >
+                        P{i}
+                      </div>
+                      <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-black/80 px-2 py-1 rounded text-xs text-white pixelated opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        {isActive ? "Selected" : "Click to select"}
+                      </div>
                     </div>
-                    <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-black/80 px-2 py-1 rounded text-xs text-white pixelated opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      Click to select
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
 
@@ -119,17 +156,38 @@ export default function Home() {
                 {["CITY", "FOREST", "DESERT", "SNOW"].map((track, i) => (
                   <div
                     key={i}
-                    className="bg-gray-900 border-2 border-gray-700 rounded flex items-center justify-center cursor-pointer hover:border-yellow-400 hover:bg-gray-800 transition-colors duration-200 relative group"
+                    className={`bg-gray-900 border-2 ${
+                      selectedTrack === track ? "border-yellow-400 bg-gray-800" : "border-gray-700"
+                    } rounded flex items-center justify-center cursor-pointer hover:border-yellow-400 hover:bg-gray-800 transition-colors duration-200 relative group`}
+                    onClick={() => setSelectedTrack(track)}
                   >
-                    <div className="text-white pixelated text-center text-sm md:text-base group-hover:text-yellow-400">
+                    <div
+                      className={`text-white pixelated text-center text-sm md:text-base ${
+                        selectedTrack === track ? "text-yellow-400" : ""
+                      } group-hover:text-yellow-400`}
+                    >
                       {track}
                     </div>
                     <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-black/80 px-2 py-1 rounded text-xs text-white pixelated opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      Click to select
+                      {selectedTrack === track ? "Selected" : "Click to select"}
                     </div>
                   </div>
                 ))}
               </div>
+            </div>
+
+            <div className="col-span-1 md:col-span-2 flex justify-center mt-4">
+              <button
+                onClick={startGame}
+                disabled={activePlayers.length === 0 || selectedTrack === null}
+                className={`pixelated px-6 py-3 text-lg ${
+                  activePlayers.length > 0 && selectedTrack !== null
+                    ? "bg-yellow-600 text-black hover:bg-yellow-500"
+                    : "bg-gray-700 text-gray-400 cursor-not-allowed"
+                } border-2 border-gray-600 rounded`}
+              >
+                START SNAKE GAME
+              </button>
             </div>
           </div>
         )
@@ -344,7 +402,7 @@ export default function Home() {
         {showMenu ? (
           <div className="w-full flex flex-col items-center justify-center">
             <motion.div
-              className="bg-black/70 p-4 md:p-6 rounded-lg border-4 border-gray-700 w-64 md:w-80"
+              className="bg-black/70 p-4 md:p-6 md:pt-2 rounded-lg border-4 border-gray-700 w-64 md:w-80"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.3 }}
@@ -397,28 +455,48 @@ export default function Home() {
         ) : (
           <div className="w-full px-2 md:px-8">
             <motion.div
-              className="bg-black/70 p-3 md:p-6 rounded-lg border-2 md:border-4 border-gray-700 h-full"
+              className="bg-black/70 p-3 md:p-6 md:pt-2 rounded-lg border-2 md:border-4 border-gray-700 h-full"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="flex justify-between items-center mb-3 md:mb-6">
+              <div className="flex justify-between items-center mb-3 md:mb-1">
+                <div className="w-24 md:w-32">
+                  {showGame && (
+                    <button
+                      onClick={() => setShowGame(false)}
+                      className="bg-gray-800 text-white p-1 md:p-2 rounded border-2 border-gray-600 hover:bg-gray-700 flex items-center"
+                    >
+                      <span className="pixelated text-xs md:text-sm">BACK</span>
+                    </button>
+                  )}
+                </div>
+
                 <h2 className="pixelated text-white text-lg md:text-2xl font-bold flex items-center">
-                  <span className="hidden md:inline-block">
-                    {menuItems.find((item) => item.name.toLowerCase().replace(/\s+/g, "_") === currentView)?.icon}
-                  </span>
-                  {menuItems.find((item) => item.name.toLowerCase().replace(/\s+/g, "_") === currentView)?.name}
+                  {showGame ? (
+                    "SNAKE GAME"
+                  ) : (
+                    <>
+                      <span className="hidden md:inline-block">
+                        {menuItems.find((item) => item.name.toLowerCase().replace(/\s+/g, "_") === currentView)?.icon}
+                      </span>
+                      {menuItems.find((item) => item.name.toLowerCase().replace(/\s+/g, "_") === currentView)?.name}
+                    </>
+                  )}
                 </h2>
-                <button
-                  onClick={() => setShowMenu(true)}
-                  className="bg-gray-800 text-white p-1 md:p-2 rounded border-2 border-gray-600 hover:bg-gray-700 flex items-center relative group"
-                >
-                  <Menu className="h-4 w-4 md:h-5 md:w-5 mr-1" />
-                  <span className="pixelated text-xs md:text-sm">MENU</span>
-                  <div className="absolute -bottom-8 right-0 bg-black/80 px-2 py-1 rounded text-[10px] md:text-xs text-white pixelated opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    ESC key
-                  </div>
-                </button>
+
+                <div className="w-24 md:w-32 flex justify-end">
+                  <button
+                    onClick={() => setShowMenu(true)}
+                    className="bg-gray-800 text-white p-1 md:p-2 rounded border-2 border-gray-600 hover:bg-gray-700 flex items-center relative group"
+                  >
+                    <Menu className="h-4 w-4 md:h-5 md:w-5 mr-1" />
+                    <span className="pixelated text-xs md:text-sm">MENU</span>
+                    <div className="absolute -bottom-8 right-0 bg-black/80 px-2 py-1 rounded text-[10px] md:text-xs text-white pixelated opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      ESC key
+                    </div>
+                  </button>
+                </div>
               </div>
 
               {renderView()}
@@ -451,6 +529,515 @@ export default function Home() {
           </div>
         </div>
       </footer>
+    </div>
+  )
+}
+
+// Helper function to get player color
+function getPlayerColor(playerIndex: number): string {
+  const colors = [
+    "bg-red-500", // Player 1 - Red
+    "bg-blue-500", // Player 2 - Blue
+    "bg-green-500", // Player 3 - Green
+    "bg-yellow-500", // Player 4 - Yellow
+  ]
+  return colors[playerIndex - 1] || "bg-gray-500"
+}
+
+// Snake Game Component
+function SnakeGame({ players, onExit }: { players: number[]; onExit: () => void }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [gameState, setGameState] = useState<{
+    snakes: {
+      positions: { x: number; y: number }[]
+      direction: string
+      color: string
+      score: number
+      alive: boolean
+    }[]
+    food: { x: number; y: number; type: string }
+    gameOver: boolean
+    winner: number | null
+  }>({
+    snakes: [],
+    food: { x: 0, y: 0, type: "apple" },
+    gameOver: false,
+    winner: null,
+  })
+
+  const [gameStarted, setGameStarted] = useState(false)
+  const [countdown, setCountdown] = useState(3)
+
+  const gridSize = 20
+  const cellSize = 15
+  const gameSpeed = useRef(150)
+  const gameLoopRef = useRef<number | null>(null)
+  const keysPressed = useRef<{ [key: string]: boolean }>({})
+
+  // Initialize game
+  useEffect(() => {
+    if (!canvasRef.current) return
+
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return
+
+    // Set canvas size
+    canvas.width = gridSize * cellSize * 2
+    canvas.height = gridSize * cellSize * 2
+
+    // Initialize snakes
+    const initialSnakes = players.map((player, index) => {
+      // Position snakes in different corners
+      let startX, startY
+      switch (index) {
+        case 0: // Top left
+          startX = Math.floor(gridSize / 4)
+          startY = Math.floor(gridSize / 4)
+          break
+        case 1: // Top right
+          startX = Math.floor((gridSize * 3) / 4)
+          startY = Math.floor(gridSize / 4)
+          break
+        case 2: // Bottom left
+          startX = Math.floor(gridSize / 4)
+          startY = Math.floor((gridSize * 3) / 4)
+          break
+        case 3: // Bottom right
+          startX = Math.floor((gridSize * 3) / 4)
+          startY = Math.floor((gridSize * 3) / 4)
+          break
+        default:
+          startX = Math.floor(gridSize / 2)
+          startY = Math.floor(gridSize / 2)
+      }
+
+      return {
+        positions: [
+          { x: startX, y: startY },
+          { x: startX - 1, y: startY },
+          { x: startX - 2, y: startY },
+        ],
+        direction: "right",
+        color: getPlayerColor(player).replace("bg-", "text-"),
+        score: 0,
+        alive: true,
+      }
+    })
+
+    // Generate initial food
+    const food = generateFood(initialSnakes)
+
+    setGameState({
+      snakes: initialSnakes,
+      food,
+      gameOver: false,
+      winner: null,
+    })
+
+    // Start countdown
+    const countdownInterval = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(countdownInterval)
+          setGameStarted(true)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => {
+      clearInterval(countdownInterval)
+      if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current)
+    }
+  }, [players])
+
+  // Game loop
+  useEffect(() => {
+    if (!gameStarted || gameState.gameOver) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      keysPressed.current[e.key.toLowerCase()] = true
+    }
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      keysPressed.current[e.key.toLowerCase()] = false
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    window.addEventListener("keyup", handleKeyUp)
+
+    let lastTime = 0
+    const gameLoop = (timestamp: number) => {
+      if (timestamp - lastTime > gameSpeed.current) {
+        lastTime = timestamp
+        updateGame()
+      }
+      gameLoopRef.current = requestAnimationFrame(gameLoop)
+    }
+
+    gameLoopRef.current = requestAnimationFrame(gameLoop)
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown)
+      window.removeEventListener("keyup", handleKeyUp)
+      if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current)
+    }
+  }, [gameStarted, gameState.gameOver])
+
+  // Draw game
+  useEffect(() => {
+    if (!canvasRef.current) return
+
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return
+
+    // Clear canvas
+    ctx.fillStyle = "#111"
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    // Draw grid
+    ctx.strokeStyle = "#333"
+    ctx.lineWidth = 0.5
+    for (let i = 0; i <= gridSize * 2; i++) {
+      ctx.beginPath()
+      ctx.moveTo(i * cellSize, 0)
+      ctx.lineTo(i * cellSize, canvas.height)
+      ctx.stroke()
+
+      ctx.beginPath()
+      ctx.moveTo(0, i * cellSize)
+      ctx.lineTo(canvas.width, i * cellSize)
+      ctx.stroke()
+    }
+
+    // Draw food
+    const { food } = gameState
+    ctx.fillStyle = "#f00"
+    ctx.fillRect(food.x * cellSize, food.y * cellSize, cellSize, cellSize)
+
+    // Draw snakes
+    gameState.snakes.forEach((snake) => {
+      if (!snake.alive) return
+
+      // Get color from Tailwind class
+      let color
+      switch (snake.color) {
+        case "text-red-500":
+          color = "#ef4444"
+          break
+        case "text-blue-500":
+          color = "#3b82f6"
+          break
+        case "text-green-500":
+          color = "#22c55e"
+          break
+        case "text-yellow-500":
+          color = "#eab308"
+          break
+        default:
+          color = "#6b7280"
+      }
+
+      // Draw snake body
+      snake.positions.forEach((pos, i) => {
+        ctx.fillStyle = i === 0 ? color : `${color}aa`
+        ctx.fillRect(pos.x * cellSize, pos.y * cellSize, cellSize, cellSize)
+
+        // Draw eyes on head
+        if (i === 0) {
+          ctx.fillStyle = "#000"
+          const eyeSize = cellSize / 4
+
+          // Position eyes based on direction
+          let leftEyeX, leftEyeY, rightEyeX, rightEyeY
+
+          switch (snake.direction) {
+            case "up":
+              leftEyeX = pos.x * cellSize + eyeSize
+              leftEyeY = pos.y * cellSize + eyeSize
+              rightEyeX = pos.x * cellSize + cellSize - eyeSize * 2
+              rightEyeY = pos.y * cellSize + eyeSize
+              break
+            case "down":
+              leftEyeX = pos.x * cellSize + eyeSize
+              leftEyeY = pos.y * cellSize + cellSize - eyeSize * 2
+              rightEyeX = pos.x * cellSize + cellSize - eyeSize * 2
+              rightEyeY = pos.y * cellSize + cellSize - eyeSize * 2
+              break
+            case "left":
+              leftEyeX = pos.x * cellSize + eyeSize
+              leftEyeY = pos.y * cellSize + eyeSize
+              rightEyeX = pos.x * cellSize + eyeSize
+              rightEyeY = pos.y * cellSize + cellSize - eyeSize * 2
+              break
+            case "right":
+              leftEyeX = pos.x * cellSize + cellSize - eyeSize * 2
+              leftEyeY = pos.y * cellSize + eyeSize
+              rightEyeX = pos.x * cellSize + cellSize - eyeSize * 2
+              rightEyeY = pos.y * cellSize + cellSize - eyeSize * 2
+              break
+            default:
+              leftEyeX = pos.x * cellSize + eyeSize
+              leftEyeY = pos.y * cellSize + eyeSize
+              rightEyeX = pos.x * cellSize + cellSize - eyeSize * 2
+              rightEyeY = pos.y * cellSize + eyeSize
+          }
+
+          ctx.fillRect(leftEyeX, leftEyeY, eyeSize, eyeSize)
+          ctx.fillRect(rightEyeX, rightEyeY, eyeSize, eyeSize)
+        }
+      })
+    })
+
+    // Draw countdown or game over
+    if (!gameStarted) {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.7)"
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+      ctx.font = '48px "Pixelated", monospace'
+      ctx.fillStyle = "#fff"
+      ctx.textAlign = "center"
+      ctx.fillText(`${countdown}`, canvas.width / 2, canvas.height / 2)
+    } else if (gameState.gameOver) {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.7)"
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+      ctx.font = '32px "Pixelated", monospace'
+      ctx.fillStyle = "#fff"
+      ctx.textAlign = "center"
+
+      if (gameState.winner !== null) {
+        ctx.fillText(`PLAYER ${gameState.winner} WINS!`, canvas.width / 2, canvas.height / 2 - 20)
+      } else {
+        ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 20)
+      }
+
+      ctx.font = '16px "Pixelated", monospace'
+      ctx.fillText("Press ESC to return to menu", canvas.width / 2, canvas.height / 2 + 20)
+    }
+  }, [gameState, gameStarted, countdown])
+
+  // Update game state
+  const updateGame = () => {
+    setGameState((prevState) => {
+      // Check if game is over
+      if (prevState.gameOver) return prevState
+
+      // Check if there's a winner
+      const aliveSnakes = prevState.snakes.filter((snake) => snake.alive)
+      if (aliveSnakes.length === 0) {
+        return { ...prevState, gameOver: true }
+      }
+
+      const winningSnake = prevState.snakes.find((snake) => snake.score >= 30)
+      if (winningSnake) {
+        const winnerIndex = prevState.snakes.indexOf(winningSnake)
+        return {
+          ...prevState,
+          gameOver: true,
+          winner: players[winnerIndex],
+        }
+      }
+
+      // Update snake directions based on key presses
+      const updatedSnakes = prevState.snakes.map((snake, index) => {
+        if (!snake.alive) return snake
+
+        let newDirection = snake.direction
+
+        // Player 1: WASD
+        if (index === 0) {
+          if (keysPressed.current["w"] && snake.direction !== "down") newDirection = "up"
+          if (keysPressed.current["s"] && snake.direction !== "up") newDirection = "down"
+          if (keysPressed.current["a"] && snake.direction !== "right") newDirection = "left"
+          if (keysPressed.current["d"] && snake.direction !== "left") newDirection = "right"
+        }
+
+        // Player 2: IJKL
+        if (index === 1) {
+          if (keysPressed.current["i"] && snake.direction !== "down") newDirection = "up"
+          if (keysPressed.current["k"] && snake.direction !== "up") newDirection = "down"
+          if (keysPressed.current["j"] && snake.direction !== "right") newDirection = "left"
+          if (keysPressed.current["l"] && snake.direction !== "left") newDirection = "right"
+        }
+
+        // Player 3: Arrow keys
+        if (index === 2) {
+          if (keysPressed.current["arrowup"] && snake.direction !== "down") newDirection = "up"
+          if (keysPressed.current["arrowdown"] && snake.direction !== "up") newDirection = "down"
+          if (keysPressed.current["arrowleft"] && snake.direction !== "right") newDirection = "left"
+          if (keysPressed.current["arrowright"] && snake.direction !== "left") newDirection = "right"
+        }
+
+        // Player 4: Numpad 8, 4, 6, 2
+        if (index === 3) {
+          if (keysPressed.current["8"] && snake.direction !== "down") newDirection = "up"
+          if (keysPressed.current["2"] && snake.direction !== "up") newDirection = "down"
+          if (keysPressed.current["4"] && snake.direction !== "right") newDirection = "left"
+          if (keysPressed.current["6"] && snake.direction !== "left") newDirection = "right"
+        }
+
+        return { ...snake, direction: newDirection }
+      })
+
+      // Move snakes
+      const newSnakes = updatedSnakes.map((snake) => {
+        if (!snake.alive) return snake
+
+        const head = { ...snake.positions[0] }
+
+        // Move head based on direction
+        switch (snake.direction) {
+          case "up":
+            head.y -= 1
+            break
+          case "down":
+            head.y += 1
+            break
+          case "left":
+            head.x -= 1
+            break
+          case "right":
+            head.x += 1
+            break
+        }
+
+        // Check wall collision
+        if (head.x < 0 || head.x >= gridSize * 2 || head.y < 0 || head.y >= gridSize * 2) {
+          return { ...snake, alive: false }
+        }
+
+        // Check self collision
+        if (snake.positions.some((pos) => pos.x === head.x && pos.y === head.y)) {
+          return { ...snake, alive: false }
+        }
+
+        // Check collision with other snakes
+        for (const otherSnake of updatedSnakes) {
+          if (otherSnake === snake || !otherSnake.alive) continue
+
+          if (otherSnake.positions.some((pos) => pos.x === head.x && pos.y === head.y)) {
+            return { ...snake, alive: false }
+          }
+        }
+
+        // Check food collision
+        let newScore = snake.score
+        let ateFood = false
+
+        if (head.x === prevState.food.x && head.y === prevState.food.y) {
+          newScore += 1
+          ateFood = true
+        }
+
+        // Create new positions array
+        const newPositions = [head, ...snake.positions]
+        if (!ateFood) newPositions.pop()
+
+        return {
+          ...snake,
+          positions: newPositions,
+          score: newScore,
+        }
+      })
+
+      // Check if any snake ate food
+      const foodEaten = newSnakes.some(
+        (snake) =>
+          snake.alive && snake.positions[0].x === prevState.food.x && snake.positions[0].y === prevState.food.y,
+      )
+
+      // Generate new food if eaten
+      let newFood = prevState.food
+      if (foodEaten) {
+        newFood = generateFood(newSnakes)
+      }
+
+      return {
+        ...prevState,
+        snakes: newSnakes,
+        food: newFood,
+      }
+    })
+  }
+
+  // Generate food at random position
+  const generateFood = (snakes: any[]) => {
+    let x, y
+    let validPosition = false
+
+    while (!validPosition) {
+      x = Math.floor(Math.random() * gridSize * 2)
+      y = Math.floor(Math.random() * gridSize * 2)
+
+      validPosition = true
+
+      // Check if food spawns on any snake
+      for (const snake of snakes) {
+        if (!snake.alive) continue
+
+        if (snake.positions.some((pos: { x: number; y: number }) => pos.x === x && pos.y === y)) {
+          validPosition = false
+          break
+        }
+      }
+    }
+
+    return { x, y, type: "apple" }
+  }
+
+  // Handle exit game
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onExit()
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [onExit])
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex-1 flex flex-col items-center justify-center">
+        <div className="relative">
+          <canvas
+            ref={canvasRef}
+            className="border-4 border-gray-700 bg-gray-900"
+            style={{ imageRendering: "pixelated" }}
+          ></canvas>
+
+          <div className="absolute top-2 left-2 grid grid-cols-2 gap-2">
+            {gameState.snakes.map((snake, i) => (
+              <div
+                key={i}
+                className={`pixelated text-xs ${snake.color} ${!snake.alive ? "line-through opacity-50" : ""}`}
+              >
+                P{players[i]}: {snake.score}/30 {!snake.alive ? "(DEAD)" : ""}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
+          <div className="pixelated text-xs text-white bg-gray-800/50 p-2 rounded">
+            <span className="text-red-500">P1:</span> WASD
+          </div>
+          <div className="pixelated text-xs text-white bg-gray-800/50 p-2 rounded">
+            <span className="text-blue-500">P2:</span> IJKL
+          </div>
+          <div className="pixelated text-xs text-white bg-gray-800/50 p-2 rounded">
+            <span className="text-green-500">P3:</span> ↑↓←→
+          </div>
+          <div className="pixelated text-xs text-white bg-gray-800/50 p-2 rounded">
+            <span className="text-yellow-500">P4:</span> 8246
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
